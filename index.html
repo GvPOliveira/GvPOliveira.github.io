@@ -644,10 +644,10 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;flex-
 
   /* Log de requisições animado */
   const reqs = [
-    ['GET', '/products', '200', 14], ['POST', '/invoices', '201', 38],
-    ['GET', '/branches/3/stock', '200', 21], ['POST', '/requests', '201', 27],
-    ['GET', '/products/999', '404', 9], ['POST', '/requests/12/fulfill', '200', 18],
-    ['GET', '/movements', '200', 16], ['POST', '/requests/12/fulfill', '409', 11]
+    ['GET', '/products', '200', 14], ['POST', '/products', '201', 38],
+    ['GET', '/branches', '200', 21], ['POST', '/branches', '201', 27],
+    ['GET', '/products/P999', '404', 9], ['GET', '/branches/F03', '200', 18],
+    ['POST', '/products', '409', 16], ['POST', '/branches', '400', 11]
   ];
   const log = document.getElementById('log'); let i = 0;
   function addLine(){
@@ -663,11 +663,11 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;flex-
   /* Projetos */
   const projects = [
     {title: 'Almoxarifado v3 · Spring Boot', tags: ['Java 21', 'Spring Boot', 'Spring Data JPA', 'MySQL'],
-     url: 'https://github.com/GvPOliveira/almoxarifado-v3', link: 'Repositório da v3',
-     desc: 'Recomecei o projeto do zero com o ecossistema Spring para comparar, na prática, todo o trabalho manual da v2 com JPA/Hibernate e Spring Data JPA.',
-     points: ['Arquitetura em camadas: Controller → Service → Repository', 'Estoque por filial com quantidade e localização próprias', 'Notas fiscais com destino STOCK ou DIRECT', 'Estorno gera movimentação de reversão, sem apagar a original'],
-     endpoint: 'GET /branches/3/stock', status: ['200 OK', 'ok'],
-     json: '[\n  {\n    "productCode": "LUV-NIT-M",\n    "branchCode": "F03",\n    "quantity": 120,\n    "location": "A-02-04"\n  }\n]'},
+     url: 'https://github.com/GvPOliveira/almoxarifado-v3', link: 'Repositório da v3', badge: 'Em andamento',
+     desc: 'Recomecei o projeto do zero com o ecossistema Spring para comparar, na prática, todo o trabalho manual da v2 com JPA/Hibernate e Spring Data JPA. Hoje a API já cobre produtos e filiais; notas fiscais, requisições e estornos são as próximas etapas.',
+     points: ['Domínio completo mapeado em entidades JPA, com repositórios testados', 'API REST de produtos e filiais com DTOs de entrada e de resposta', 'Erros tratados num @RestControllerAdvice com o status certo (400, 404, 409)', 'Testes de integração dos endpoints com MockMvc', 'Credenciais do banco lidas de variáveis de ambiente'],
+     endpoint: 'POST /products', status: ['409 Conflict', 'warn'],
+     json: '{\n  "message": "Esse código já existe."\n}'},
     {title: 'Almoxarifado v2 · JDBC', tags: ['Java', 'JDBC', 'Transações', 'MySQL'],
      url: 'https://github.com/GvPOliveira/almoxarifado-system', link: 'Repositório da v1 e v2',
      desc: 'Evolução da v1 no mesmo repositório: os dados saem das listas em memória e passam a ser persistidos em MySQL, com controle manual de conexões e transações.',
@@ -677,15 +677,15 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;flex-
     {title: 'Almoxarifado v1 · POO', tags: ['Java', 'POO', 'Collections', 'Exceções'],
      url: 'https://github.com/GvPOliveira/almoxarifado-system/tags', link: 'Tag da v1',
      desc: 'Primeira versão, em Java puro, focada em regras de negócio e orientação a objetos. Finalizada com uma tag no Git. Código e commits em inglês para praticar inglês técnico.',
-     points: ['Entrada por nota fiscal e saída por requisição', 'Bloqueio de nota processada duas vezes e de atendimento duplicado', 'Exceções de negócio como InsufficientStockException', 'Enum, HashMap, equals()/hashCode() e listas imutáveis'],
+     points: ['Entrada por nota fiscal e saída por requisição', 'Bloqueio de nota processada duas vezes e de atendimento duplicado', 'Exceções de negócio como InsufficientStockException', 'Enum, HashMap, equals()/hashCode() e listas imutáveis', 'Mais de 60 testes unitários do domínio com JUnit 5'],
      endpoint: 'request.fulfill(product, 50);', status: ['exceção lançada', 'warn'],
      json: 'InsufficientStockException:\n  available: 30\n  requested: 50'},
     {title: 'Gerenciador de Jogadores', tags: ['Spring Boot', 'JPA', 'H2', 'JavaScript'],
      url: 'https://github.com/GvPOliveira/gerenciador-de-jogadores', link: 'Repositório', badge: 'Acadêmico · em andamento',
      desc: 'Projeto da disciplina de Desenvolvimento Web: API REST para cadastro de jogadores de futebol, com uma interface em HTML, CSS e JavaScript que consome a API.',
-     points: ['CRUD completo: cadastrar, listar, alterar e excluir', 'Relacionamento entre as entidades Jogador e Time com JPA', 'Banco H2 em memória', 'Front-end chama a API com fetch e atualiza a página sem recarregar', 'Back e front no mesmo projeto, ponta a ponta'],
+     points: ['CRUD completo: cadastrar, listar, alterar e excluir', 'Relacionamento entre as entidades Jogador e Time com JPA', 'Banco H2 em memória', 'Validações com Bean Validation e erros no formato ProblemDetail', 'Front-end chama a API com fetch e atualiza a página sem recarregar', 'Back e front no mesmo projeto, ponta a ponta'],
      endpoint: 'PUT /jogadores/7', status: ['200 OK', 'ok'],
-     json: '{\n  "id": 7,\n  "nome": "Carlos Silva",\n  "time": {\n    "id": 2,\n    "nome": "Santos"\n  },\n  "numeroCamisa": 10\n}'}
+     json: '{\n  "id": 7,\n  "nome": "Carlos Silva",\n  "numeroCamisa": 10,\n  "time": {\n    "id": 2,\n    "nome": "Santos"\n  },\n  "lesionado": false,\n  "descricao": "Meia de criação"\n}'}
   ];
   const list = document.getElementById('projects');
   const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
