@@ -125,7 +125,7 @@ h1 .accent{color:var(--accent)}
 @keyframes slide{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
 @media (max-width:860px){
   .hero .wrap{grid-template-columns:1fr;padding-block:40px 48px;gap:24px}
-  .portrait{max-width:340px;order:-1}
+  .portrait{max-width:260px}
   #flow{-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.2) 85%);mask-image:linear-gradient(180deg,#000 0%,#000 40%,rgba(0,0,0,.2) 85%)}
 }
 
@@ -746,8 +746,8 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;flex-
     builtMode = mode === 'pixel' ? 'pixel' : 'dots';
     if (mode === 'pixel'){
       const old = parts;
-      parts = buildPixel().map(p => Object.assign(p, {delay: 0, vx: 0, vy: 0,
-        x: reduce ? p.hx : p.hx + (Math.random() - .5) * S * 1.2, y: reduce ? p.hy : p.hy + (Math.random() - .5) * S * 1.2}));
+      // começa já formado: a primeira impressão é o retrato, não uma nuvem de pixels
+      parts = buildPixel().map(p => Object.assign(p, {delay: 0, vx: 0, vy: 0, x: p.hx, y: p.hy}));
       if (old.length && !reduce) parts.forEach((p, k) => { const o = old[k % old.length]; p.x = o.x; p.y = o.y; });
       drawPortrait();
       if (!reduce && !running){ running = true; requestAnimationFrame(tick); }
@@ -847,7 +847,7 @@ footer .wrap{padding-block:28px;display:flex;justify-content:space-between;flex-
     else { src = placeholder(); build(); }
   }
   loadSource();
-  { const ai = new Image(); ai.onload = () => { artImg = ai; if (mode === 'pixel') build(); }; ai.src = PIXEL_ART; }
+  { const ai = new Image(); ai.onload = () => { artImg = ai; if (mode === 'pixel'){ parts = []; build(); } }; ai.src = PIXEL_ART; }
   let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 150); });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', build);
   new MutationObserver(build).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
